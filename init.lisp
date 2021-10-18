@@ -4,19 +4,16 @@
 (define-configuration browser
     ((session-restore-prompt :never-restore)))
     
-; Auto mode
-(define-configuration nyxt/auto-mode:auto-mode
-      ((nyxt/auto-mode:prompt-on-mode-toggle t)))
-
 ; Execute command
 (define-configuration buffer
     ((override-map (let ((map (make-keymap "override-map")))
-                     (define-key map
-                         "M-x" 'execute-command)))))
+                     (define-key map "C-s" 'nyxt/web-mode:search-buffer) ; Align with swiper
+                     (define-key map "M-x" 'execute-command)
+                     ))))
 
 ;; Enable vim bindings
 (define-configuration (buffer web-buffer)
-    ((default-modes (append '(auto-mode nyxt::vi-normal-mode) %slot-default%))))
+    ((default-modes (append '(blocker-mode auto-mode nyxt::vi-insert-mode) %slot-default%))))
 
 (define-configuration (buffer prompt-buffer)
      ((default-modes (append '(nyxt::vi-insert-mode) %slot-default%))))
@@ -64,5 +61,7 @@
                       :fallback-url "https://www.google.com")))))
 
 
-;; Zulip
+(load (nyxt-init-file "emacs.lisp"))
+(load (nyxt-init-file "github.lisp"))
+(load (nyxt-init-file "youtube.lisp"))
 (load (nyxt-init-file "zulip.lisp"))
