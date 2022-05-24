@@ -65,3 +65,9 @@
 (load (nyxt-init-file "github.lisp"))
 (load (nyxt-init-file "youtube.lisp"))
 (load (nyxt-init-file "zulip.lisp"))
+
+;;
+;; Customization
+;;
+
+(setq github-fork-org "ioforks")

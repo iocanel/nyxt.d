@@ -1,5 +1,6 @@
 (in-package #:nyxt-user)
 
+(defvar github-fork-org nil "The repository to use for forks")
 (defvar github-checkout-base-path "/home/iocanel/workspace/src/github.com/" "The base path to checkout projects from github.")
 
 (defun github-current-user ()
@@ -27,6 +28,21 @@
     (ppcre:register-groups-bind (org repo) ("https://github.com/([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+).*" current-url)
                                 (buffer-load (concatenate 'string "https://github.com/" org "/" repo "/pulls/" (github-current-user))))))
 
+(define-command github-open-in-gitpod ()
+  "Open the target project in gitpod."
+ (let ((current-url (render-url (url (current-buffer)))))
+    (ppcre:register-groups-bind (org repo) ("https://github.com/([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+).*" current-url)
+                                (buffer-load (concatenate 'string
+                                                          "https://gitpod.io/#ORG=" org ",PROJECT=" repo ",PROFILE=doom/https://github.com/emacs-lsp/lsp-gitpod")))))
+
+(define-command github-goto-fork ()
+  "Go to my fork repository."
+  (let ((current-url (render-url (url (current-buffer))))
+        (f (or github-fork-org (github-current-user))))
+    (ppcre:register-groups-bind (org repo) ("https://github.com/([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+).*" current-url)
+                                (buffer-load (concatenate 'string "https://github.com/" f "/" repo)))))
+
+    
 (define-command github-checkout-project ()
   "Checkout project locally."
   (let ((current-url (render-url (url (current-buffer)))))
@@ -50,11 +66,8 @@
 (define-key github-keymap "C-x i a" 'github-issues-assigned)
 (define-key github-keymap "C-x p a" 'github-pulls-authored)
 (define-key github-keymap "C-x c p" 'github-checkout-project)
-
-(define-key github-keymap "g i n" 'github-issues-new)
-(define-key github-keymap "g i a" 'github-issues-assigned)
-(define-key github-keymap "g p a" 'github-pulls-authored)
-(define-key github-keymap "g c p" 'github-checkout-project)
+(define-key github-keymap "C-x o g" 'github-open-in-gitpod)
+(define-key github-keymap "C-x g f" 'github-goto-fork)
 
 (define-mode github-mode ()
   "Mode for use when visiting a github buffer."
